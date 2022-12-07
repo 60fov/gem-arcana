@@ -1,0 +1,39 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body {
+    background-color: hsla(217, 91%, 62%, 1);
+    background-image:
+        radial-gradient(at 18% 15%, hsla(275, 83%, 77%, 1) 0px, transparent 50%),
+        radial-gradient(at 25% 58%, hsla(19, 98%, 73%, 0.38) 0px, transparent 50%),
+        radial-gradient(at 89% 54%, hsla(275, 91%, 64%, 1) 0px, transparent 50%),
+        radial-gradient(at 0% 50%, hsla(241, 87%, 70%, 1) 0px, transparent 50%),
+        radial-gradient(at 29% 31%, hsla(267, 100%, 39%, 1) 0px, transparent 50%),
+        radial-gradient(at 31% 59%, rgb(131, 93, 218) 0px, transparent 50%),
+        radial-gradient(at 0% 4%, hsla(256, 67%, 63%, 1) 0px, transparent 50%);
+
+    background-size: 200% 200%;
+    background-position: 100% 0%;
+    background-attachment: fixed;
+    animation: move-bg 20s ease-in-out infinite;
+}
+
+@keyframes move-bg {
+    0%, 100% {
+        background-position: 50% 50%;
+    }
+
+    25% {
+        background-position: 100% 0%;
+    }
+
+    50% {
+        background-position: 75% 25%;
+    }
+
+    75% {
+        backgorund-positin: 25% 30%;
+    }
+}

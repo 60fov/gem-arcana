@@ -1,0 +1,4 @@
+# 🪄 Gem Arcana 🔮
+
+### TODO:
+[] - readme
