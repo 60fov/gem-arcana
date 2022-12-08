@@ -1,6 +1,7 @@
 import { type ReactElement } from "react"
 import type Label from "./Label"
 
+// TODO: pass dark property to children
 type Props = {
     children: ReactElement<typeof Label>[]
     col?: boolean

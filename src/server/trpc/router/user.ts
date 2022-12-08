@@ -1,11 +1,7 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
+import { zValidator } from "../../../utils/validators";
 import { protectedProcedure, publicProcedure, router } from "../trpc";
-
-const usernameValidator =
-    z.string()
-        .min(3).max(12)
-        .refine((val) => !val.match(/[^\p{L}\p{Nd}$!_]/gu))
 
 export const userRouter = router({
     me: protectedProcedure
@@ -26,42 +22,135 @@ export const userRouter = router({
 
         }),
 
+    find: publicProcedure
+        .input(
+            z.string()
+                .cuid()
+                .or(zValidator.username)
+        )
+        .query(async ({ input, ctx }) => {
+            if (z.string().cuid().safeParse(input).success) {
+                try {
+                    const user = await ctx.prisma.user.findUniqueOrThrow({
+                        where: { id: input },
+                        select: {
+                            id: true,
+                            username: true
+                        }
+                    })
+
+                    return user
+                } catch (e) {
+                    throw new TRPCError({
+                        code: "NOT_FOUND",
+                        message: `user not found, id: ${input}`,
+                        cause: e
+                    })
+                }
+            }
+            try {
+                const user = await ctx.prisma.user.findUniqueOrThrow({
+                    where: { username: input },
+                    select: {
+                        id: true,
+                        username: true
+                    }
+                })
+
+                return user
+            } catch (e) {
+                throw new TRPCError({
+                    code: "NOT_FOUND",
+                    message: `user not found, username: ${input}`,
+                    cause: e
+                })
+            }
+        }),
+
     findById: publicProcedure
         .input(
             z.string()
                 .cuid()
         )
         .query(async ({ input, ctx }) => {
+            try {
+                const user = await ctx.prisma.user.findUniqueOrThrow({
+                    where: { id: input },
+                    select: {
+                        id: true,
+                        username: true
+                    }
+                })
 
-            const user = await ctx.prisma.user.findUnique({
-                where: { id: input }
-            })
-
-            return {
-                user
+                return user
+            } catch (e) {
+                throw new TRPCError({
+                    code: "NOT_FOUND",
+                    message: `user not found, id: ${input}`,
+                    cause: e
+                })
             }
+
         }),
 
     findByUsername: publicProcedure
-        .input(usernameValidator)
+        .input(zValidator.username)
         .query(async ({ input, ctx }) => {
-            const user = await ctx.prisma.user.findUnique({
-                where: { username: input }
-            })
-            return {
-                user
+
+            try {
+                const user = await ctx.prisma.user.findUniqueOrThrow({
+                    where: { username: input },
+                    select: {
+                        id: true,
+                        username: true
+                    }
+                })
+
+                return user
+            } catch (e) {
+                throw new TRPCError({
+                    code: "NOT_FOUND",
+                    message: `user not found, username: ${input}`,
+                    cause: e
+                })
             }
         }),
 
     setUsername: protectedProcedure
-        .input(usernameValidator)
+        .input(zValidator.username)
         .mutation(async ({ input, ctx }) => {
             const user = await ctx.prisma.user.update({
                 where: { id: ctx.session.user.id },
-                data: { username: input }
+                data: { username: input },
             })
             return {
-                user
+                ...user
+            }
+        }),
+
+    getGems: publicProcedure
+        .input(
+            z.string()
+                .cuid()
+        )
+        .query(async ({ input, ctx }) => {
+            try {
+                const user = await ctx.prisma.user.findUniqueOrThrow({
+                    where: { id: input },
+                    select: {
+                        gems: true
+                    }
+                })
+
+                return user.gems
+            } catch (e) {
+                throw new TRPCError({
+                    code: "NOT_FOUND",
+                    message: `user not found, id: ${input}`,
+                    cause: e
+                })
             }
         })
+
+
 })
